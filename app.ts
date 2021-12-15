@@ -1,15 +1,14 @@
-import express, { Application, Request, Response } from "express";
-require('dotenv').config()
+import express, { Application } from "express";
+const bodyParser = require("body-parser");
+require("dotenv").config();
 
 const app: Application = express();
 const port = 3000;
-
+app.use(bodyParser.json());
 const mountRoutes = require("./routes/index");
 mountRoutes(app);
 
 // Body parsing Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 try {
   app.listen(port, (): void => {

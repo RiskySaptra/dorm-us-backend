@@ -1,7 +1,14 @@
 const db = require("../../config/dbConfig");
+// import { auth } from "../../config/firebaseConfig";
 
 // constoh try catch yang bener
 // codenya di sesuaikan. code error postgreenya bisa di parsing kalau mau (kalau bisa pakai constant parsingnya. dibuatin table ntar)
+const register = async (req: any, res: any) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+
+  res.send({ email, password });
+};
 
 const getUsersById = async (req: any, res: any) => {
   const { id } = req.params;
@@ -25,4 +32,4 @@ const getAllUsers = async (req: any, res: any) => {
   }
 };
 
-export { getUsersById, getAllUsers };
+export { getUsersById, getAllUsers, register };

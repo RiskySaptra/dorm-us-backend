@@ -1,6 +1,5 @@
 // routing module
 const Router = require("express-promise-router");
-const db = require("../../config/dbConfig");
 const router = new Router();
 
 // modules HERE :

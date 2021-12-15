@@ -1,15 +1,14 @@
 const { Pool } = require("pg");
-// dont foget set to env
+
 const connect = {
-  user: "risky",
-  host: "localhost",
-  database: "experiment",
-  password: "30second",
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DATABASE_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 };
 
 const pool = new Pool(connect);
-
 module.exports = {
   query: (text: string, params: any) => pool.query(text, params),
 };

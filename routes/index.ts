@@ -1,7 +1,13 @@
-// module index
-const users = require("./user/index");
+import express from "express";
+const router = express.Router();
 
-module.exports = (app: any) => {
-  app.get("/users", users);
-  app.post("/register", users);
-};
+// modules HERE :
+import { getUsersById, getAllUsers, register, login } from "../models/users";
+
+router.post("/register", register);
+router.post("/login", login);
+
+router.get("/users", getAllUsers);
+router.get("/:id", getUsersById);
+
+module.exports = router;

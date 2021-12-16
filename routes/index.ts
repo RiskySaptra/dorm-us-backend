@@ -1,13 +1,14 @@
 import express from "express";
+import { checkIfAuthenticated } from "../middlewares/auth-middleware";
+import { getUsersById, getAllUsers, register } from "../models/users";
+
 const router = express.Router();
 
 // modules HERE :
-import { getUsersById, getAllUsers, register, login } from "../models/users";
 
 router.post("/register", register);
-router.post("/login", login);
 
-router.get("/users", getAllUsers);
+router.get("/users", checkIfAuthenticated, getAllUsers);
 router.get("/:id", getUsersById);
 
 module.exports = router;

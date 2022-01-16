@@ -1,35 +1,41 @@
 import { admin } from "../config/firebaseConfig";
+import { getAuthTokenValidatorRequest } from "../Interface/authInterface";
+import { NextFunction } from "express";
+
 const db = require("../config/dbConfig");
 
-const getAuthToken = (req: any, res: any, next: any) => {
+const getAuthToken = (
+  req: getAuthTokenValidatorRequest,
+  next: NextFunction
+) => {
   if (
     req.headers.authorization &&
     req.headers.authorization.split(" ")[0] === "Bearer"
   ) {
     req.authToken = req.headers.authorization.split(" ")[1];
   } else {
-    req.authToken = null;
+    req.authToken = "";
   }
   next();
 };
 
 export const checkIfAuthenticated = (req: any, res: any, next: any) => {
-  getAuthToken(req, res, async () => {
+  getAuthToken(req, async () => {
+    const { authToken } = req;
     try {
-      const { authToken } = req;
       const userInfo = await admin.auth().verifyIdToken(authToken);
       const { rows } = await db.query(
-        `select ug.group_tenant, ug.group_name from system.users u
+        `select user_id, ug.user_group_id, ug.group_tenant, ug.group_name from system.users u
         join system.user_group ug on u.user_group_id = ug.user_group_id
-        WHERE google_uid = encrypt($1::bytea, $2, 'aes')::bytea`,
-        [userInfo.uid, process.env.DB_KEY]
+        WHERE google_uid = $1`,
+        [userInfo.uid]
       );
-      req.schemaname = rows[0].group_tenant;
+      req.user = rows[0];
       return next();
-    } catch (e) {
-      return res
-        .status(401)
-        .send({ error: "You are not authorized to make this request" });
+    } catch (err: any) {
+      return res.status(401).send({
+        error: `You are not authorized to make this request, ${err.message}`,
+      });
     }
   });
 };

@@ -1,24 +1,33 @@
 import { admin } from "../config/firebaseConfig";
+import { Response } from "express";
+
 const db = require("../config/dbConfig");
 
-const register = async (req: any, res: any) => {
-  const { email, password } = req.body;
-  try {
-    const user = await admin.auth().createUser({
-      email,
-      // phoneNumber,
-      password,
-      // displayName: `${firstName} ${lastName}`,
-      // photoURL: photoUrl
-    });
-    await db.query(
-      "insert into system.users(google_uid) values (encrypt($1::bytea, $2, 'aes')::bytea);",
-      [user.uid, process.env.DB_KEY]
-    );
+// interface modul
+import { registerValidatorRequest } from "../Interface/usersInterface";
 
-    return res.send(user);
+const register = async (req: registerValidatorRequest, res: Response) => {
+  try {
+    console.log(req.body, "emmeks");
+    // const { email, password, firstName, lastName } = req.body;
+
+    // const user = await admin.auth().createUser({
+    //   email,
+    //   // phoneNumber,
+    //   password,
+    //   displayName: `${firstName} ${lastName}`,
+    //   // photoURL: photoUrl
+    // });
+
+    // await db.query(
+    //   "insert into system.users(google_uid, display_name) values ($1, $2);",
+    //   [user.uid, user.displayName]
+    // );
+
+    return res.send(req.body);
   } catch (error) {
-    res.status(400).send(error);
+    console.log(error, "errosnmuasd");
+    return res.status(400).send(error);
   }
 };
 
@@ -53,19 +62,30 @@ const getUsersById = async (req: any, res: any) => {
   }
 };
 
-const getAllUsers = async (req: any, res: any) => {
-  console.log(req.schemaname);
-
+const getUserGroup = async (req: any, res: any) => {
+  console.log(req);
   try {
-    const { rows } = await db.query(
-      "select *, encode(decrypt(google_uid , $1 , 'aes')::bytea, 'ESCAPE') from system.users;",
-      [process.env.DB_KEY]
-    );
-
-    res.send(rows);
-  } catch (error) {
-    res.status(400).send(error);
+    const userInfo = await admin.auth().verifyIdToken(req.authToken);
+    console.log(userInfo);
+  } catch (error: any) {
+    console.log(error.message);
+    return res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
   }
+
+  // const { user_group_id } = req.user;
+  // console.log(req.user);
+  // try {
+  //   const { rows } = await db.query(
+  //     "select * from system.users where user_group_id = $1;",
+  //     [user_group_id]
+  //   );
+  //   res.send(rows);
+  // } catch (error) {
+  //   res.status(400).send(error);
+  // }
 };
 
-export { getUsersById, getAllUsers, register };
+export { getUsersById, getUserGroup, register };

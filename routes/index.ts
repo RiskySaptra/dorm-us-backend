@@ -1,14 +1,16 @@
 import express from "express";
 import { checkIfAuthenticated } from "../middlewares/auth-middleware";
-import { getUsersById, getAllUsers, register } from "../models/users";
+import { registerJoi } from "../middlewares/joi-middleware";
+import { getUsersById, getUserGroup, register } from "../models/users";
 
 const router = express.Router();
 
 // modules HERE :
 
-router.post("/register", register);
-
-router.get("/users", checkIfAuthenticated, getAllUsers);
+// modul user
+router.post("/register", registerJoi, register);
+// delete this
+router.get("/users", checkIfAuthenticated, getUserGroup);
 router.get("/:id", getUsersById);
 
 module.exports = router;

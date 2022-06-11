@@ -1,19 +1,21 @@
-import express, { Application, Request, Response } from "express";
+require("dotenv").config();
 
+import express, { Application } from "express";
+const cors = require("cors");
+const bodyParser = require("body-parser");
 const app: Application = express();
-const port = 3000;
-
-const mountRoutes = require("./routes/index");
-mountRoutes(app);
-
-// Body parsing Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const port = 6969;
+const routes = require("./routes");
 
 try {
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use("/api/v1", routes);
   app.listen(port, (): void => {
     console.log(`Connected successfully on port ${port}`);
   });
 } catch (error: any) {
+  console.log(error);
+
   console.error(`Error occured: ${error.message}`);
 }
